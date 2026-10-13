@@ -2,5 +2,4 @@ __pycache__/
 *.pyc
 .env
 ultima.txt
-registro.log
 token_estado.json

@@ -50,6 +50,8 @@ jobs:
           git push || echo "no se pudo guardar en el repositorio, se continua igual"
 
       - name: Publicar la historia en Instagram
+        id: publicacion
+        continue-on-error: true
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
         run: |
@@ -61,6 +63,22 @@ jobs:
           else
             python3 publicar.py --imagen "$RUTA" --url-imagen "$URL"
           fi
+
+      - name: Guardar el registro en el repositorio
+        if: always()
+        run: |
+          git config user.name "historias-bot"
+          git config user.email "actions@github.com"
+          git add -f registro.log || true
+          git commit -m "Registro de la ejecución $(date +%F\ %H:%M)" || echo "sin cambios"
+          git pull --rebase -q || true
+          git push || echo "no se pudo guardar el registro"
+
+      - name: Marcar el resultado
+        if: steps.publicacion.outcome == 'failure'
+        run: |
+          echo "La publicación falló. El detalle quedó en auto-ig/registro.log"
+          exit 1
 
       - name: Guardar la historia como resultado descargable
         uses: actions/upload-artifact@v4
