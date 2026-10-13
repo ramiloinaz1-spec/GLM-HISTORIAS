@@ -45,9 +45,9 @@ jobs:
           echo "ARCHIVO=auto-ig/$ARCHIVO" >> $GITHUB_ENV
           git config user.name "historias-bot"
           git config user.email "actions@github.com"
-          git add "$ARCHIVO" estado.json
+          git add -f "$ARCHIVO" estado.json
           git commit -m "Historia del $(date +%F)" || echo "sin cambios"
-          git push
+          git push || echo "no se pudo guardar en el repositorio, se continua igual"
 
       - name: Publicar la historia en Instagram
         env:
