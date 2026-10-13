@@ -1,0 +1,46 @@
+name: Aviso para renovar el token
+
+# El token de Instagram dura unos 60 dias. Este aviso abre un recordatorio
+# cada 50 dias para regenerarlo desde el panel de Meta (son dos clics).
+on:
+  schedule:
+    - cron: "0 13 1,20 * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  avisar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Abrir el recordatorio
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const titulo = "Renovar el token de Instagram";
+            const abiertos = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              labels: "token",
+            });
+            if (abiertos.data.some((i) => i.title === titulo)) return;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: titulo,
+              labels: ["token"],
+              body: [
+                "El token de Instagram vence a los 60 dias de generado.",
+                "",
+                "Para renovarlo:",
+                "1. Entrar a developers.facebook.com, a la app de Instagram.",
+                "2. Casos de uso -> Personalizar -> 2. Generar tokens de acceso.",
+                "3. Generar un token nuevo y copiarlo.",
+                "4. En este repositorio: Settings -> Secrets and variables -> Actions",
+                "   -> IG_ACCESS_TOKEN -> Update secret, y pegar el nuevo.",
+                "",
+                "Cerrar este aviso cuando este hecho.",
+              ].join("\n"),
+            });

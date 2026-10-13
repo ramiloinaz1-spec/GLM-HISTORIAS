@@ -29,7 +29,7 @@ import time
 import requests
 
 BASE = pathlib.Path(__file__).resolve().parent
-API = "https://graph.facebook.com/v23.0"
+API = "https://graph.instagram.com/v23.0"
 LOG = BASE / "registro.log"
 
 
@@ -48,8 +48,42 @@ def entorno(nombre, obligatoria=True):
     return valor
 
 
+def resolver_user_id(token):
+    """Si no se configuro IG_USER_ID, lo consulta a partir del token."""
+    valor = os.environ.get("IG_USER_ID", "").strip()
+    if valor:
+        return valor
+    datos = requests.get(
+        f"{API}/me", params={"fields": "id,username", "access_token": token}, timeout=30
+    ).json()
+    if "id" not in datos:
+        log(f"[error] no se pudo leer la cuenta: {datos}")
+        sys.exit(1)
+    log(f"[ok] cuenta: @{datos.get('username', '?')}")
+    return datos["id"]
+
+
+def esperar_url(url, intentos=10, espera=6):
+    """La imagen tiene que estar publicada antes de que Meta intente descargarla."""
+    for i in range(intentos):
+        try:
+            if requests.head(url, timeout=20, allow_redirects=True).status_code == 200:
+                return True
+        except requests.RequestException:
+            pass
+        log(f"[...] esperando que la imagen este disponible ({i + 1}/{intentos})")
+        time.sleep(espera)
+    log("[error] la imagen nunca quedo accesible publicamente")
+    return False
+
+
 def subir_imagen(ruta):
     """Devuelve una URL publica de la imagen. La API de Instagram la descarga de ahi."""
+    url_directa = os.environ.get("IMAGE_URL", "").strip()
+    if url_directa:
+        log(f"[ok] usando la imagen ya publicada: {url_directa}")
+        return url_directa if esperar_url(url_directa) else sys.exit(1)
+
     base_propia = os.environ.get("HOSTING_BASE_URL", "").strip()
     if base_propia:
         # Variante para servidor propio: la imagen ya quedo servida por el sitio.
@@ -122,7 +156,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--imagen", help="ruta de la imagen a publicar")
     ap.add_argument("--simular", action="store_true", help="no publica, solo prueba")
+    ap.add_argument("--url-imagen", help="URL publica ya existente de la imagen")
     args = ap.parse_args()
+    if args.url_imagen:
+        os.environ["IMAGE_URL"] = args.url_imagen
 
     if args.imagen:
         ruta = pathlib.Path(args.imagen)
@@ -137,8 +174,8 @@ def main():
         log(f"[error] no existe la imagen {ruta}")
         sys.exit(1)
 
-    ig_user_id = entorno("IG_USER_ID")
     token = entorno("IG_ACCESS_TOKEN")
+    ig_user_id = resolver_user_id(token)
 
     url = subir_imagen(ruta)
     contenedor = crear_contenedor(ig_user_id, token, url)
@@ -152,4 +189,8 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except requests.RequestException as error:
+        log(f"[error] problema de conexión: {error}")
+        sys.exit(1)
