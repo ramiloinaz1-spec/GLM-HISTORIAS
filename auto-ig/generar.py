@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+    relativa = rutas[0].relative_to(BASE)
+    (BASE / "ultima.txt").write_text(str(relativa).replace("\\", "/"), encoding="utf-8")#!/usr/bin/env python3
 """
 Generador de historias de Instagram para Grupo Loinaz Martinez Seguros.
 
