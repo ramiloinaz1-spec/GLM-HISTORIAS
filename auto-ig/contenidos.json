@@ -1,0 +1,113 @@
+{
+  "_nota": "Banco de contenidos para las historias diarias. Editá, agregá o sacá items: el generador los rota en orden y vuelve a empezar al terminar. Campos: id, volanta (texto chico de arriba), titulo (usar \\n para cortar lineas), texto (opcional), pie (recuadro opcional), tema (salvia | crema | oscuro).",
+  "historias": [
+    {
+      "id": "01-franquicia",
+      "volanta": "Preguntas frecuentes",
+      "titulo": "¿Qué es la\nfranquicia?",
+      "texto": "Es el monto que pagás vos ante un siniestro. La aseguradora cubre el daño que supere ese valor.",
+      "tema": "salvia"
+    },
+    {
+      "id": "02-choque",
+      "volanta": "Siniestros",
+      "titulo": "¿Qué hago si\ntengo un choque?",
+      "texto": "Sacá fotos, anotá los datos del otro conductor y su seguro, y avisanos lo antes posible.",
+      "tema": "crema"
+    },
+    {
+      "id": "03-poliza-al-dia",
+      "volanta": "Recordatorio",
+      "titulo": "¿Tu póliza\nestá al día?",
+      "texto": "Revisá que tus datos y tu cobertura sigan reflejando lo que tenés hoy.",
+      "pie": "Escribinos",
+      "tema": "oscuro"
+    },
+    {
+      "id": "04-terceros-completo",
+      "volanta": "Coberturas",
+      "titulo": "¿Qué cubre\nterceros\ncompleto?",
+      "texto": "Daños a terceros, robo, incendio y destrucción total. Según el plan, también granizo y cristales.",
+      "tema": "salvia"
+    },
+    {
+      "id": "05-seguro-hogar",
+      "volanta": "Seguro de hogar",
+      "titulo": "Tu casa\ntambién merece\nestar cubierta",
+      "texto": "Incendio, robo, daños por agua y responsabilidad civil: todo en una sola póliza.",
+      "tema": "crema"
+    },
+    {
+      "id": "06-asesoramiento",
+      "volanta": "Por qué un productor",
+      "titulo": "No estás solo\nante el siniestro",
+      "texto": "Un productor asesor te acompaña en el reclamo y gestiona con la compañía por vos.",
+      "tema": "salvia"
+    },
+    {
+      "id": "07-granizo",
+      "volanta": "Temporada de tormentas",
+      "titulo": "¿El granizo\nestá incluido\nen tu póliza?",
+      "texto": "Es una cobertura adicional en muchos planes. Consultanos si la tuya la tiene.",
+      "tema": "oscuro"
+    },
+    {
+      "id": "08-datos-actualizados",
+      "volanta": "Un minuto, una vez al año",
+      "titulo": "Actualizá\nla suma\nasegurada",
+      "texto": "Si el valor de tu auto o tu casa cambió, la cobertura también tiene que acompañar.",
+      "tema": "crema"
+    },
+    {
+      "id": "09-viaje",
+      "volanta": "Antes de salir a la ruta",
+      "titulo": "¿Viajás\nestas vacaciones?",
+      "texto": "Chequeá que tu cobertura esté vigente y llevá a mano los datos de asistencia.",
+      "pie": "Consultanos",
+      "tema": "salvia"
+    },
+    {
+      "id": "10-mascotas",
+      "volanta": "Responsabilidad civil",
+      "titulo": "Un imprevisto\nle pasa\na cualquiera",
+      "texto": "La cobertura de responsabilidad civil te protege frente a daños que puedas causarle a un tercero.",
+      "tema": "crema"
+    },
+    {
+      "id": "11-consulta",
+      "volanta": "Estamos para ayudarte",
+      "titulo": "¿Tenés\nuna duda\nde tu póliza?",
+      "texto": "Escribinos y te la respondemos sin compromiso.",
+      "pie": "Mandanos un mensaje",
+      "tema": "oscuro"
+    },
+    {
+      "id": "12-comercio",
+      "volanta": "Seguro de comercio",
+      "titulo": "Tu negocio,\nprotegido\ntodo el año",
+      "texto": "Cubrí mercadería, instalaciones y responsabilidad hacia tus clientes.",
+      "tema": "salvia"
+    },
+    {
+      "id": "13-vida",
+      "volanta": "Seguro de vida",
+      "titulo": "La tranquilidad\nde los\nque te rodean",
+      "texto": "Un seguro de vida es una forma concreta de cuidar a tu familia.",
+      "tema": "crema"
+    },
+    {
+      "id": "14-lobos",
+      "volanta": "Lobos, Buenos Aires",
+      "titulo": "Nos conocés\ny te conocemos",
+      "texto": "Somos tu productor asesor de seguros de confianza, cerca tuyo.",
+      "tema": "salvia"
+    },
+    {
+      "id": "15-denuncia",
+      "volanta": "Siniestros",
+      "titulo": "Cuanto antes\navises, mejor",
+      "texto": "La denuncia temprana agiliza el reclamo. Guardá nuestro contacto para tenerlo a mano.",
+      "tema": "oscuro"
+    }
+  ]
+}
