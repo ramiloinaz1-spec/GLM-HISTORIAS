@@ -49,18 +49,11 @@ jobs:
           git commit -m "Historia del $(date +%F)" || echo "sin cambios"
           git push || echo "no se pudo guardar en el repositorio, se continua igual"
 
-      - name: Diagnóstico de secretos
-        env:
-          TODOS: ${{ toJSON(secrets) }}
-        run: |
-          echo "Secretos visibles para este flujo:" | tee -a registro.log
-          echo "$TODOS" | python3 -c "import json,sys; d=json.load(sys.stdin); [print(' -',k) for k in d]" | tee -a registro.log
-
       - name: Publicar la historia en Instagram
         id: publicacion
         continue-on-error: true
         env:
-          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN || secrets.IG_ACCES_TOKEN }}
         run: |
           URL="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_REF_NAME}/${ARCHIVO}"
           echo "Imagen: $URL"
