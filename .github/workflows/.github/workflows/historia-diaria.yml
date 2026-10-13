@@ -1,0 +1,59 @@
+name: Historia diaria de Instagram
+
+on:
+  schedule:
+    - cron: "45 12 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      simular:
+        description: "Probar sin publicar (true para simular)"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    working-directory: auto-ig
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: |
+          pip install --quiet pillow playwright requests
+          playwright install --with-deps chromium
+
+      - name: Generar la historia del día
+        run: python3 generar.py
+
+      - name: Publicar la imagen en el repositorio
+        run: |
+          ARCHIVO=$(python3 -c "import pathlib;print(pathlib.Path(open('ultima.txt').read().strip()).as_posix())")
+          echo "ARCHIVO=auto-ig/$ARCHIVO" >> $GITHUB_ENV
+          git config user.name "historias-bot"
+          git config user.email "actions@github.com"
+          git add "$ARCHIVO" estado.json
+          git commit -m "Historia del $(date +%F)" || echo "sin cambios"
+          git push
+
+      - name: Publicar la historia en Instagram
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: |
+          URL="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_REF_NAME}/${ARCHIVO}"
+          echo "Imagen: $URL"
+          RUTA="${ARCHIVO#auto-ig/}"
+          if [ "${{ github.event.inputs.simular }}" = "true" ]; then
+            python3 publicar.py --imagen "$RUTA" --url-imagen "$URL" --simular
+          else
+            python3 publicar.py --imagen "$RUTA" --url-imagen "$URL"
+          fi
