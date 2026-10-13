@@ -130,8 +130,11 @@ def render(items, destino=SALIDA):
             pagina.wait_for_timeout(350)
             tmp = destino / f"_tmp_{item['id']}.png"
             pagina.screenshot(path=str(tmp))
-            final = destino / f"historia_{item['id']}.png"
-            Image.open(tmp).resize((ANCHO, ALTO), Image.LANCZOS).save(final)
+            imagen = Image.open(tmp).resize((ANCHO, ALTO), Image.LANCZOS)
+            # PNG para compartir a mano; JPEG porque la API de Instagram solo acepta JPEG.
+            imagen.save(destino / f"historia_{item['id']}.png")
+            final = destino / f"historia_{item['id']}.jpg"
+            imagen.convert("RGB").save(final, "JPEG", quality=92, subsampling=0)
             tmp.unlink()
             generados.append(final)
             print(f"[ok] {final.name} — {item['volanta']}")
@@ -174,6 +177,7 @@ def main():
     item = historias[proximo_indice(len(historias))]
     rutas = render([item])
     # El publicador lee esta ruta para subir la historia del dia.
+    # Se guarda relativa a esta carpeta para que sirva tambien en GitHub Actions.
     relativa = rutas[0].relative_to(BASE)
     (BASE / "ultima.txt").write_text(str(relativa).replace("\\", "/"), encoding="utf-8")
 
