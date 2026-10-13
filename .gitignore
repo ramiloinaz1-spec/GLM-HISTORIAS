@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+ultima.txt
+estado.json
+registro.log
+token_estado.json
