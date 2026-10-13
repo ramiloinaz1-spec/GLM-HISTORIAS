@@ -1,2 +1,6 @@
 2026-10-13 14:57:09  [error] falta la variable de entorno IG_ACCESS_TOKEN
 2026-10-13 15:00:00  [error] falta la variable de entorno IG_ACCESS_TOKEN
+Secretos visibles para este flujo:
+ - IG_ACCES_TOKEN
+ - github_token
+2026-10-13 15:04:07  [error] falta la variable de entorno IG_ACCESS_TOKEN
