@@ -9,9 +9,12 @@ name: Historia diaria de Instagram
 # intentos siguientes no hacen nada.
 on:
   schedule:
-    - cron: "37 12 * * 1-5" # 9:37 de Argentina
-    - cron: "23 14 * * 1-5" # 11:23, reintento
-    - cron: "11 16 * * 1-5" # 13:11, ultimo reintento
+    # Horarios de Argentina. Todos los intentos terminan antes de las 11,
+    # asi que a mas tardar la historia queda publicada cerca de esa hora.
+    - cron: "6 12 * * 1-5" # 9:06
+    - cron: "44 12 * * 1-5" # 9:44, reintento
+    - cron: "19 13 * * 1-5" # 10:19, reintento
+    - cron: "51 13 * * 1-5" # 10:51, ultimo intento
   workflow_dispatch:
     inputs:
       simular:
