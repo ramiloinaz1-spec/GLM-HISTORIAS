@@ -1,14 +1,21 @@
 name: Historia diaria de Instagram
 
-# Publica una historia de lunes a viernes a las 9:45 de Argentina (12:45 UTC).
-# Tambien se puede ejecutar a mano desde la pestaña Actions, con "Run workflow".
+# Publica una historia por dia habil.
+#
+# GitHub suele retrasar (y a veces saltear) las ejecuciones programadas cuando
+# sus servidores estan cargados, asi que en lugar de un unico intento hay varios
+# a lo largo de la mañana. Un control impide que se publique dos veces el mismo
+# dia: apenas una publicacion sale bien, queda una marca en publicado/ y los
+# intentos siguientes no hacen nada.
 on:
   schedule:
-    - cron: "45 12 * * 1-5"
+    - cron: "37 12 * * 1-5" # 9:37 de Argentina
+    - cron: "23 14 * * 1-5" # 11:23, reintento
+    - cron: "11 16 * * 1-5" # 13:11, ultimo reintento
   workflow_dispatch:
     inputs:
       simular:
-        description: "Probar sin publicar (escribí true para simular)"
+        description: "Probar sin publicar (true para simular)"
         required: false
         default: "false"
 
@@ -23,23 +30,41 @@ jobs:
   publicar:
     runs-on: ubuntu-latest
     steps:
-      - name: Traer el repositorio
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Preparar Python
-        uses: actions/setup-python@v5
+      - name: ¿Ya se publicó hoy?
+        id: control
+        run: |
+          FECHA=$(TZ=America/Argentina/Buenos_Aires date +%F)
+          echo "FECHA=$FECHA" >> $GITHUB_ENV
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "seguir=si" >> $GITHUB_OUTPUT
+            echo "Ejecución manual: se continúa."
+          elif [ -f "publicado/$FECHA.txt" ]; then
+            echo "seguir=no" >> $GITHUB_OUTPUT
+            echo "La historia del $FECHA ya se publicó. No se hace nada."
+          else
+            echo "seguir=si" >> $GITHUB_OUTPUT
+            echo "Todavía no se publicó el $FECHA."
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.control.outputs.seguir == 'si'
         with:
           python-version: "3.12"
 
       - name: Instalar dependencias
+        if: steps.control.outputs.seguir == 'si'
         run: |
           pip install --quiet pillow playwright requests
           playwright install --with-deps chromium
 
       - name: Generar la historia del día
+        if: steps.control.outputs.seguir == 'si'
         run: python3 generar.py
 
-      - name: Publicar la imagen en el repositorio
+      - name: Guardar la imagen en el repositorio
+        if: steps.control.outputs.seguir == 'si'
         run: |
           ARCHIVO=$(cat ultima.txt)
           echo "ARCHIVO=auto-ig/$ARCHIVO" >> $GITHUB_ENV
@@ -47,10 +72,12 @@ jobs:
           git config user.email "actions@github.com"
           git add -f "$ARCHIVO" estado.json
           git commit -m "Historia del $(date +%F)" || echo "sin cambios"
-          git push || echo "no se pudo guardar en el repositorio, se continua igual"
+          git pull --rebase -q origin main || true
+          git push || echo "no se pudo guardar la imagen, se continúa igual"
 
       - name: Publicar la historia en Instagram
         id: publicacion
+        if: steps.control.outputs.seguir == 'si'
         continue-on-error: true
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN || secrets.IG_ACCES_TOKEN }}
@@ -64,24 +91,30 @@ jobs:
             python3 publicar.py --imagen "$RUTA" --url-imagen "$URL"
           fi
 
-      - name: Guardar el registro en el repositorio
-        if: always()
+      - name: Dejar constancia de la publicación
+        if: steps.publicacion.outcome == 'success' && github.event.inputs.simular != 'true'
+        run: |
+          mkdir -p publicado
+          echo "Publicada el $FECHA" > "publicado/$FECHA.txt"
+          git config user.name "historias-bot"
+          git config user.email "actions@github.com"
+          git add -f "publicado/$FECHA.txt" registro.log
+          git commit -m "Publicada la historia del $FECHA" || echo "sin cambios"
+          git pull --rebase -q origin main || true
+          git push || echo "no se pudo guardar la constancia"
+
+      - name: Guardar el registro cuando algo falla
+        if: failure() || steps.publicacion.outcome == 'failure'
         run: |
           git config user.name "historias-bot"
           git config user.email "actions@github.com"
           git add -f registro.log || true
-          git commit -m "Registro de la ejecución $(date +%F\ %H:%M)" || echo "sin cambios"
-          git pull --rebase -q || true
+          git commit -m "Registro del $FECHA" || echo "sin cambios"
+          git pull --rebase -q origin main || true
           git push || echo "no se pudo guardar el registro"
 
       - name: Marcar el resultado
         if: steps.publicacion.outcome == 'failure'
         run: |
-          echo "La publicación falló. El detalle quedó en auto-ig/registro.log"
+          echo "La publicación falló. El detalle está en auto-ig/registro.log"
           exit 1
-
-      - name: Guardar la historia como resultado descargable
-        uses: actions/upload-artifact@v4
-        with:
-          name: historia
-          path: salida/
