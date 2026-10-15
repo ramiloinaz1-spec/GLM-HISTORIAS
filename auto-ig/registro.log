@@ -18,3 +18,4 @@ Secretos visibles para este flujo:
 2026-10-14 13:00:40  [ok] contenedor creado: 17963431728239740
 2026-10-14 13:00:40  [...] contenedor IN_PROGRESS (1/12)
 2026-10-14 13:00:48  [ok] historia publicada: 17898762705608452
+2026-10-15 12:39:41  [error] no se pudo leer la cuenta: {'error': {'message': 'API access blocked.', 'type': 'OAuthException', 'code': 200, 'fbtrace_id': 'Adq0o-co7Dmq_EpZutk1wHh'}}
