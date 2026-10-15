@@ -19,3 +19,8 @@ Secretos visibles para este flujo:
 2026-10-14 13:00:40  [...] contenedor IN_PROGRESS (1/12)
 2026-10-14 13:00:48  [ok] historia publicada: 17898762705608452
 2026-10-15 12:39:41  [error] no se pudo leer la cuenta: {'error': {'message': 'API access blocked.', 'type': 'OAuthException', 'code': 200, 'fbtrace_id': 'Adq0o-co7Dmq_EpZutk1wHh'}}
+2026-10-15 12:58:39  [ok] cuenta: @loinazmartinezseguros
+2026-10-15 12:58:39  [ok] usando la imagen ya publicada: https://raw.githubusercontent.com/ramiloinaz1-spec/GLM-HISTORIAS/main/auto-ig/salida/historia_10-mascotas.jpg
+2026-10-15 12:58:42  [ok] contenedor creado: 17963610483239740
+2026-10-15 12:58:42  [...] contenedor IN_PROGRESS (1/12)
+2026-10-15 12:58:50  [ok] historia publicada: 18104639984298277
