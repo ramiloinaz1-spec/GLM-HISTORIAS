@@ -1,0 +1,80 @@
+name: Publicar una imagen puntual
+
+# Publica en Instagram una imagen que ya este en el repositorio, dentro de
+# auto-ig/manual/. Sirve para historias sueltas (una promo, una efemeride)
+# sin tocar el banco de contenidos diarios.
+#
+# Como se usa:
+#   1. Subir la imagen (JPEG, 1080x1920) a auto-ig/manual/
+#   2. Actions -> "Publicar una imagen puntual" -> Run workflow
+#   3. Escribir el nombre del archivo, por ejemplo: dia_del_seguro.jpg
+on:
+  workflow_dispatch:
+    inputs:
+      archivo:
+        description: "Nombre del archivo dentro de auto-ig/manual/"
+        required: true
+      simular:
+        description: "Probar sin publicar (true para simular)"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    working-directory: auto-ig
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install --quiet requests pillow
+
+      - name: Revisar la imagen
+        run: |
+          ARCHIVO="manual/${{ github.event.inputs.archivo }}"
+          if [ ! -f "$ARCHIVO" ]; then
+            echo "No existe auto-ig/$ARCHIVO. Archivos disponibles:"
+            ls -1 manual/ 2>/dev/null || echo "(la carpeta manual/ está vacía)"
+            exit 1
+          fi
+          python3 - "$ARCHIVO" <<'PY'
+          import sys
+          from PIL import Image
+          im = Image.open(sys.argv[1])
+          print(f"Formato {im.format}, tamaño {im.size[0]}x{im.size[1]}")
+          if im.format != "JPEG":
+              sys.exit("La API de Instagram solo acepta JPEG.")
+          PY
+          echo "ARCHIVO=$ARCHIVO" >> $GITHUB_ENV
+
+      - name: Publicar en Instagram
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN || secrets.IG_ACCES_TOKEN }}
+        run: |
+          URL="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_REF_NAME}/auto-ig/${ARCHIVO}"
+          echo "Imagen: $URL"
+          if [ "${{ github.event.inputs.simular }}" = "true" ]; then
+            python3 publicar.py --imagen "$ARCHIVO" --url-imagen "$URL" --simular
+          else
+            python3 publicar.py --imagen "$ARCHIVO" --url-imagen "$URL"
+          fi
+
+      - name: Guardar el registro
+        if: always()
+        run: |
+          git config user.name "historias-bot"
+          git config user.email "actions@github.com"
+          git add -f registro.log || true
+          git commit -m "Registro de publicación manual" || echo "sin cambios"
+          git pull --rebase -q origin main || true
+          git push || echo "no se pudo guardar el registro"
