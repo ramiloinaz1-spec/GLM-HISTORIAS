@@ -49,3 +49,8 @@ Secretos visibles para este flujo:
 2026-10-21 14:04:18  [ok] contenedor creado: 17964664785239740
 2026-10-21 14:04:18  [...] contenedor IN_PROGRESS (1/12)
 2026-10-21 14:04:23  [simulacion] todo listo: no se publico nada
+2026-10-21 14:05:05  [ok] cuenta: @loinazmartinezseguros
+2026-10-21 14:05:05  [ok] usando la imagen ya publicada: https://raw.githubusercontent.com/ramiloinaz1-spec/GLM-HISTORIAS/main/auto-ig/manual/dia_del_seguro.jpg
+2026-10-21 14:05:09  [ok] contenedor creado: 17964665148239740
+2026-10-21 14:05:09  [...] contenedor IN_PROGRESS (1/12)
+2026-10-21 14:05:17  [ok] historia publicada: 18211930429371751
