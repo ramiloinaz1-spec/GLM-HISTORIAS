@@ -117,3 +117,7 @@ Secretos visibles para este flujo:
 2026-11-09 13:06:58  [ok] contenedor creado: 17967973269239740
 2026-11-09 13:06:58  [...] contenedor IN_PROGRESS (1/12)
 2026-11-09 13:07:07  [ok] historia publicada: 18004536347805922
+2026-11-10 12:58:31  [ok] cuenta: @loinazmartinezseguros
+2026-11-10 12:58:31  [ok] usando la imagen ya publicada: https://raw.githubusercontent.com/ramiloinaz1-spec/GLM-HISTORIAS/main/auto-ig/salida/historia_13-vida.jpg
+2026-11-10 12:58:33  [ok] contenedor creado: 17968150386239740
+2026-11-10 12:58:34  [error] no se pudo publicar: {'error': {'message': 'The requested resource does not exist', 'type': 'OAuthException', 'code': 24, 'error_subcode': 2207006, 'is_transient': False, 'error_user_title': 'Media Not Found', 'error_user_msg': 'The media with 17,968,150,386,239,740 cannot be found.', 'fbtrace_id': 'ACQjw2eN4iOytCKfar_4WPy'}}
