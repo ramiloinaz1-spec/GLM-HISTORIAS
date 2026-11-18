@@ -1,20 +1,22 @@
 name: Historia diaria de Instagram
 
-# Publica una historia por dia habil.
+# Publica una historia por dia habil, siempre entre las 8:30 y las 11:15 de la
+# mañana (hora de Argentina).
 #
-# GitHub suele retrasar (y a veces saltear) las ejecuciones programadas cuando
-# sus servidores estan cargados, asi que en lugar de un unico intento hay varios
-# a lo largo de la mañana. Un control impide que se publique dos veces el mismo
-# dia: apenas una publicacion sale bien, queda una marca en publicado/ y los
-# intentos siguientes no hacen nada.
+# Por que esta armado asi: GitHub no ejecuta las tareas programadas a horario.
+# El retraso varia muchisimo (en noviembre de 2026 paso de 1 hora a 10 horas),
+# asi que fijar un unico horario de salida no sirve. En vez de eso hay muchos
+# intentos repartidos y cada uno mira la hora REAL antes de hacer nada:
+#   - fuera de la franja de la mañana  -> no publica
+#   - fin de semana                    -> no publica
+#   - ya se publico hoy                -> no publica
+# Asi, sea cual sea el retraso, alguno de los intentos cae dentro de la franja
+# y publica; los demas terminan en segundos sin tocar nada.
 on:
   schedule:
-    # Horarios de Argentina. Todos los intentos terminan antes de las 11,
-    # asi que a mas tardar la historia queda publicada cerca de esa hora.
-    - cron: "6 12 * * 1-5" # 9:06
-    - cron: "44 12 * * 1-5" # 9:44, reintento
-    - cron: "19 13 * * 1-5" # 10:19, reintento
-    - cron: "51 13 * * 1-5" # 10:51, ultimo intento
+    # Cada 30 minutos entre las 01:00 y las 14:30 UTC, de lunes a viernes.
+    # Cubre retrasos de 0 a 10 horas respecto de la franja de la mañana.
+    - cron: "0,30 1-14 * * 1-5"
   workflow_dispatch:
     inputs:
       simular:
@@ -24,6 +26,12 @@ on:
 
 permissions:
   contents: write
+
+# Las ejecuciones se encolan de a una, asi dos intentos simultaneos no pueden
+# publicar la misma historia dos veces.
+concurrency:
+  group: historia-diaria
+  cancel-in-progress: false
 
 defaults:
   run:
@@ -35,20 +43,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: ¿Ya se publicó hoy?
+      - name: ¿Corresponde publicar ahora?
         id: control
         run: |
-          FECHA=$(TZ=America/Argentina/Buenos_Aires date +%F)
+          export TZ=America/Argentina/Buenos_Aires
+          FECHA=$(date +%F)
+          HORA=$(date +%H:%M)
+          MINUTOS=$((10#$(date +%H) * 60 + 10#$(date +%M)))
+          DIA=$(date +%u)          # 1=lunes ... 7=domingo
+          DESDE=510                # 8:30
+          HASTA=675                # 11:15
           echo "FECHA=$FECHA" >> $GITHUB_ENV
+          echo "Hora en Argentina: $FECHA $HORA"
+
           if [ "${{ github.event_name }}" != "schedule" ]; then
             echo "seguir=si" >> $GITHUB_OUTPUT
-            echo "Ejecución manual: se continúa."
+            echo "Ejecución manual: se publica sin mirar la hora."
           elif [ -f "publicado/$FECHA.txt" ]; then
             echo "seguir=no" >> $GITHUB_OUTPUT
-            echo "La historia del $FECHA ya se publicó. No se hace nada."
+            echo "La historia del $FECHA ya se publicó."
+          elif [ "$DIA" -gt 5 ]; then
+            echo "seguir=no" >> $GITHUB_OUTPUT
+            echo "Es fin de semana."
+          elif [ "$MINUTOS" -lt "$DESDE" ] || [ "$MINUTOS" -gt "$HASTA" ]; then
+            echo "seguir=no" >> $GITHUB_OUTPUT
+            echo "Fuera de la franja de la mañana (8:30 a 11:15). No se publica."
           else
             echo "seguir=si" >> $GITHUB_OUTPUT
-            echo "Todavía no se publicó el $FECHA."
+            echo "Dentro de la franja: se publica."
           fi
 
       - uses: actions/setup-python@v5
@@ -74,7 +96,7 @@ jobs:
           git config user.name "historias-bot"
           git config user.email "actions@github.com"
           git add -f "$ARCHIVO" estado.json
-          git commit -m "Historia del $(date +%F)" || echo "sin cambios"
+          git commit -m "Historia del $FECHA" || echo "sin cambios"
           git pull --rebase -q origin main || true
           git push || echo "no se pudo guardar la imagen, se continúa igual"
 
