@@ -160,3 +160,8 @@ Secretos visibles para este flujo:
 2026-11-20 11:36:07  [ok] contenedor creado: 17969757384239740
 2026-11-20 11:36:07  [...] contenedor IN_PROGRESS (1/12)
 2026-11-20 11:36:16  [ok] historia publicada: 18441300400180849
+2026-11-23 11:35:56  [ok] cuenta: @loinazmartinezseguros
+2026-11-23 11:35:56  [ok] usando la imagen ya publicada: https://raw.githubusercontent.com/ramiloinaz1-spec/GLM-HISTORIAS/main/auto-ig/salida/historia_09-viaje.jpg
+2026-11-23 11:35:59  [ok] contenedor creado: 17970197970239740
+2026-11-23 11:36:00  [...] contenedor IN_PROGRESS (1/12)
+2026-11-23 11:36:09  [ok] historia publicada: 18654571801007418
