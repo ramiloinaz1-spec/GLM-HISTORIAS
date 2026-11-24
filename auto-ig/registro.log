@@ -165,3 +165,8 @@ Secretos visibles para este flujo:
 2026-11-23 11:35:59  [ok] contenedor creado: 17970197970239740
 2026-11-23 11:36:00  [...] contenedor IN_PROGRESS (1/12)
 2026-11-23 11:36:09  [ok] historia publicada: 18654571801007418
+2026-11-24 12:02:13  [ok] cuenta: @loinazmartinezseguros
+2026-11-24 12:02:13  [ok] usando la imagen ya publicada: https://raw.githubusercontent.com/ramiloinaz1-spec/GLM-HISTORIAS/main/auto-ig/salida/historia_10-mascotas.jpg
+2026-11-24 12:02:16  [ok] contenedor creado: 17970336141239740
+2026-11-24 12:02:17  [...] contenedor IN_PROGRESS (1/12)
+2026-11-24 12:02:25  [ok] historia publicada: 18166635565530485
